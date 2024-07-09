@@ -12,6 +12,8 @@ return {
   cmd = 'Neotree',
   keys = {
     { '\\', ':Neotree reveal<CR>', desc = 'NeoTree reveal', silent = true },
+    -- { '\\', ':Neotree reveal<CR>', { desc = 'NeoTree reveal' } },
+    -- vim.keymap.set("n", "<C-b>", vim.cmd.Ex)
   },
   opts = {
     filesystem = {
