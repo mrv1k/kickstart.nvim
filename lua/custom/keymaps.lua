@@ -19,3 +19,8 @@ vim.keymap.set({ 'n', 'v' }, 'C', [["_C]])
 -- I SAID NO YANKIN
 vim.keymap.set('v', 'p', [["_dhp]])
 vim.keymap.set('v', 'P', [["_DP]])
+
+-- Make C-d deterministic instead of half a screen
+-- KEEP IN SYNC WITH vim.opt.scrolloff
+vim.keymap.set('n', '<C-d>', '28jzz')
+vim.keymap.set('n', '<C-u>', '28kzz')

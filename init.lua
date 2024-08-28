@@ -156,7 +156,7 @@ vim.opt.inccommand = 'split'
 vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
-vim.opt.scrolloff = 10
+vim.opt.scrolloff = 28
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -406,6 +406,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<leader>fs', builtin.find_files, { desc = '[F]iles [S]earch ' }) -- mrv1k
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
@@ -540,10 +541,17 @@ require('lazy').setup({
           -- Rename the variable under your cursor.
           --  Most Language Servers support renaming across files, etc.
           map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame')
+          map('<F2>', vim.lsp.buf.rename, '[R]e[n]ame') -- mrv1k
 
           -- Execute a code action, usually your cursor needs to be on top of an error
           -- or a suggestion from your LSP for this to activate.
           map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
+          -- map('<cmd>.', vim.lsp.buf.code_action, '[C]ode [A]ction') -- mrv1k TODO: enable cmd .
+
+          -- Opens a popup that displays documentation about the word under your cursor
+          --  See `:help K` for why this keymap.
+          map('K', vim.lsp.buf.hover, 'Hover Documentation')
+          map('gh', vim.lsp.buf.hover, 'Hover Documentation') -- mrv1k
 
           -- WARN: This is not Goto Definition, this is Goto Declaration.
           --  For example, in C this would take you to the header.
@@ -597,6 +605,31 @@ require('lazy').setup({
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
+      -- mrv1k
+      require('lspconfig').gdscript.setup {
+        capabilities,
+        flags = {
+          debounce_text_changes = 200,
+        },
+        -- settings,
+      }
+      require('lspconfig').efm.setup {
+        -- on_attach = on_attach,
+        flags = {
+          debounce_text_changes = 150,
+        },
+
+        init_options = { documentFormatting = true },
+        settings = {
+          rootMarkers = { '.git/' },
+          languages = {
+            gdscript = {
+              { formatCommand = 'gdformat -l 100 -', formatStdin = true },
+            },
+          },
+        },
+      }
+
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
       --
@@ -634,6 +667,7 @@ require('lazy').setup({
             },
           },
         },
+        gdtoolkit = {},
       }
 
       -- Ensure the servers and tools above are installed
@@ -665,8 +699,7 @@ require('lazy').setup({
         },
       }
     end,
-  },
-
+  }, -- 'neovim/nvim-lspconfig' END
   { -- Autoformat
     'stevearc/conform.nvim',
     event = { 'BufWritePre' },
@@ -900,7 +933,7 @@ require('lazy').setup({
         --  the list of additional_vim_regex_highlighting and disabled languages for indent.
         additional_vim_regex_highlighting = { 'ruby' },
       },
-      indent = { enable = true, disable = { 'ruby' } },
+      indent = { enable = true, disable = { 'ruby', 'gdscript' } },
     },
     -- There are additional nvim-treesitter modules that you can use to interact
     -- with nvim-treesitter. You should go explore a few and see what interests you:
@@ -932,6 +965,7 @@ require('lazy').setup({
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
   -- { import = 'custom.plugins' },
+  require 'custom.plugins.vim-godot',
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
