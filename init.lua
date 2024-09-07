@@ -118,6 +118,7 @@ vim.opt.showmode = false
 --   vim.opt.clipboard = 'unnamedplus'
 -- end)
 -- vim.opt.clipboard = 'unnamedplus'
+vim.opt.wrap = true -- mrv1k
 
 -- Enable break indent
 vim.opt.breakindent = true
@@ -230,6 +231,26 @@ vim.opt.rtp:prepend(lazypath)
 --
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
+  -- <mrv1k plugins>
+  {
+    'JoosepAlviste/nvim-ts-context-commentstring',
+    opts = {
+      enable_autocmd = false,
+    },
+  },
+  {
+    'luckasRanarison/tailwind-tools.nvim',
+    name = 'tailwind-tools',
+    build = ':UpdateRemotePlugins',
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter',
+      'nvim-telescope/telescope.nvim', -- optional
+      'neovim/nvim-lspconfig', -- optional
+    },
+    opts = {}, -- your configuration
+  },
+  -- </mrv1k plugins>
+
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
@@ -439,9 +460,15 @@ require('lazy').setup({
       end, { desc = '[S]earch [N]eovim files' })
     end,
   },
-
   -- LSP Plugins
   {
+    -- mrv1k plugins
+    {
+      'pmizio/typescript-tools.nvim',
+      dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
+      opts = {},
+    },
+
     -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
     -- used for completion, annotations and signatures of Neovim apis
     'folke/lazydev.nvim',
@@ -605,14 +632,6 @@ require('lazy').setup({
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
-      -- mrv1k
-      require('lspconfig').gdscript.setup {
-        capabilities,
-        flags = {
-          debounce_text_changes = 200,
-        },
-        -- settings,
-      }
       require('lspconfig').efm.setup {
         -- on_attach = on_attach,
         flags = {
@@ -623,9 +642,7 @@ require('lazy').setup({
         settings = {
           rootMarkers = { '.git/' },
           languages = {
-            gdscript = {
-              { formatCommand = 'gdformat -l 100 -', formatStdin = true },
-            },
+            -- placeholder = { }
           },
         },
       }
@@ -650,8 +667,7 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
-        -- tsserver = {},
-        --
+        tsserver = {},
 
         lua_ls = {
           -- cmd = {...},
@@ -667,7 +683,9 @@ require('lazy').setup({
             },
           },
         },
-        gdtoolkit = {},
+
+        -- mrv1k
+        tailwindcss = {},
       }
 
       -- Ensure the servers and tools above are installed
@@ -923,7 +941,23 @@ require('lazy').setup({
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'gdscript', 'godot_resource' },
+      ensure_installed = {
+        'bash',
+        'c',
+        'diff',
+        'lua',
+        'luadoc',
+        'markdown',
+        'markdown_inline',
+        'query',
+        'vim',
+        'vimdoc',
+        'html',
+        'css',
+        'javascript',
+        'typescript',
+        'svelte',
+      },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -933,7 +967,7 @@ require('lazy').setup({
         --  the list of additional_vim_regex_highlighting and disabled languages for indent.
         additional_vim_regex_highlighting = { 'ruby' },
       },
-      indent = { enable = true, disable = { 'ruby', 'gdscript' } },
+      indent = { enable = true, disable = { 'ruby' } },
     },
     -- There are additional nvim-treesitter modules that you can use to interact
     -- with nvim-treesitter. You should go explore a few and see what interests you:
@@ -966,6 +1000,7 @@ require('lazy').setup({
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
   -- { import = 'custom.plugins' },
   require 'custom.plugins.vim-godot',
+  -- require 'custom.plugins.web-dev',
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
